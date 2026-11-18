@@ -1,0 +1,119 @@
+# Project metadata, dependencies and tool configuration for dj-buddy-python.
+# Dependencies are managed with uv: `uv add <pkg>` (runtime) or `uv add --dev <pkg>` (dev),
+# which updates both this file and uv.lock. Never edit uv.lock by hand.
+
+[project]
+name = "dj-buddy-python"
+version = "0.1.0"
+description = "DJ set planner: harmonic track recommendations and set ordering for Rekordbox libraries."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Carlos Zamora" }]
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+# Only what the foundation (P0-1) uses. Each roadmap task adds the packages it needs
+# (pyrekordbox, networkx, SQLAlchemy, FastAPI, ...) in the same change that uses them.
+dependencies = [
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "rich>=13.9",
+    "typer>=0.15",
+]
+
+[project.scripts]
+# `djbuddy` on the command line runs the Typer app in src/djbuddy/cli.py.
+djbuddy = "djbuddy.cli:app"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.120",
+    "mypy>=1.14",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.9",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/djbuddy"]
+
+# ---------------------------------------------------------------------------
+# ruff: linting and formatting
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # import sorting
+    "UP",  # pyupgrade: modern syntax for the target version
+    "B",   # flake8-bugbear: likely bugs
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+    "D",   # pydocstyle: every module, class and function needs a docstring
+]
+
+[tool.ruff.lint.pydocstyle]
+# Google style: "Args:", "Returns:", "Raises:" sections. With this convention ruff also
+# enables D417, which fails when a function parameter is missing from "Args:".
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests document themselves through their names; docstrings there are optional.
+"tests/**" = ["D"]
+
+# ---------------------------------------------------------------------------
+# mypy: type checking (strict on the pure core and recommenders, looser elsewhere)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+packages = ["djbuddy"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+no_implicit_optional = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["djbuddy.core.*", "djbuddy.recommend.*"]
+strict = true
+
+# ---------------------------------------------------------------------------
+# pytest and coverage
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config", "-ra", "--import-mode=importlib"]
+markers = [
+    "unit: fast tests of pure code; no database, network, audio or API key",
+    "integration: tests that touch a database, files on disk or the API",
+    "evals: assistant evaluations; the live-model variants run nightly, not on every push",
+]
+
+[tool.coverage.run]
+source = ["djbuddy"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+# The 90% gate on djbuddy.core and djbuddy.recommend is added with task P1-2,
+# once those packages hold code.

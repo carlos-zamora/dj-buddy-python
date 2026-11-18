@@ -1,0 +1,8 @@
+# Store text with LF line endings so a Windows checkout matches the Linux CI and VMs.
+* text=auto eol=lf
+
+# Binary files: never touch line endings or diff as text.
+*.png binary
+*.jpg binary
+*.npy binary
+*.db binary

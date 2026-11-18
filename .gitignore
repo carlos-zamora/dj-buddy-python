@@ -1,0 +1,70 @@
+# --- Python and tooling ---------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Secrets and local config ---------------------------------------------
+# Real settings and API keys never leave your machine. .env.example is the template.
+.env
+.env.*
+!.env.example
+
+# --- Local databases ------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Your music library: never commit it ----------------------------------
+# Rekordbox's own database and backups.
+master.db
+master.backup*.db
+# Rekordbox XML exports and the backups dj-buddy makes before writing.
+# Synthetic fixtures under tests/fixtures/ are the only XML exports allowed.
+rekordbox*.xml
+*.xml.bak
+!tests/fixtures/**/*.xml
+# Audio files.
+*.mp3
+*.wav
+*.flac
+*.aif
+*.aiff
+*.m4a
+*.aac
+*.ogg
+*.opus
+*.alac
+
+# --- Model weights and generated analysis ---------------------------------
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.npy
+!tests/fixtures/**/*.npy
+
+# --- Front end (Phase 3) --------------------------------------------------
+node_modules/
+web/dist/
+
+# --- Editors and OS -------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Claude Code local settings --------------------------------------------
+.claude/settings.local.json
